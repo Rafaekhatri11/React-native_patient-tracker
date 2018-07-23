@@ -12,11 +12,11 @@ import React, { Component } from 'react';
 // } from 'react-native';
 import Login from './component/auth/login';
 import Signup from './component/auth/signup';
-import Doctor from './component/doctor/doctor';
 import {Router,Scene} from 'react-native-router-flux';
 import {Provider } from 'react-redux';
 import store from './component/store/index';
 import * as firebase from 'firebase';
+import Doctorpage from './component/doctor/doctor';
 
   // Initialize Firebase
   const config = {
@@ -39,8 +39,8 @@ export default class App extends Component {
            <Router>
           <Scene key="root">
           <Scene key="/signup" component={Signup} hideNavBar title="Sign Up"/>
-          <Scene key="/login" component={Login} hideNavBar title="Log In" initial/>
-          <Scene key="/doctor" component={Doctor}  title="Doctor" />
+          <Scene key="/login" component={Login} hideNavBar title="Log In" />
+          <Scene key="/doctorpage" component={Doctorpage} initial  />
 
           </Scene>
           </Router>

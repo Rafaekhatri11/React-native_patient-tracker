@@ -4,11 +4,11 @@ import {
 
 } from 'react-native';
 
-import { Container, Text, Item, Input, Icon,Button ,Content,Spinner} from 'native-base';
+import { Container, Text, Item, Input, Icon, Button, Content, Spinner } from 'native-base';
 import Logo from '../projectLogo/logo';
-import {signIn} from '../store/action/action';
-import {Actions} from 'react-native-router-flux';
-import {connect} from 'react-redux';
+import { signIn } from '../store/action/action';
+import { Actions } from 'react-native-router-flux';
+import { connect } from 'react-redux';
 import firebase from 'firebase';
 
 class Login extends Component {
@@ -16,9 +16,9 @@ class Login extends Component {
         super();
         this.state = {
             open: true,
-            loader:true,
-            username:"",
-            password:""
+            loader: true,
+            username: "",
+            password: ""
         }
     }
     // componentDidMount() {
@@ -26,94 +26,112 @@ class Login extends Component {
     //         this.setState({ open: false })
     //     }, 1000);
     // }
-  
-    myLogInFuction(){
-        this.setState({loader:false})
+
+    myLogInFuction() {
+        this.setState({ loader: false })
         let email = this.state.username;
         let pass = this.state.password
-       firebase.auth().signInWithEmailAndPassword(email,pass)
-       .then((data) =>{
-           if(data.val() === null){
-               alert('User has been deleted by admin');
-               firebase.auth().currentUser.delete();
-           }
-           else {
-              firebase.database(`/users/${data.user.uid}/`).once('value').then((data) => console.log(data.val()));
-              let success = 'successfully logged in';
-             //  this.props.signIn(success);
-             //  Actions.push('/doctor');
+        firebase.auth().signInWithEmailAndPassword(email, pass)
+            .then((data) => {
 
-          }
-       })
+                firebase.database().ref(`/users/${data.user.uid}/`).once('value').then((user) => {
+                    console.log(user.key)
+                    if (user.key === null) {
+                        alert('User has been deleted by admin');
+                        firebase.auth().currentUser.delete();
+                    }
 
-       .catch((err) =>{
-           this.props.signIn(err);
-           alert(err);
-       })
+                    else {
+                        let success = 'successfully logged in';
+                        this.props.signIn(success);
+                        Actions.push('/doctorpage');
+                    }
+                })
+
+                // if (data.val() === null) {
+                //     alert('User has been deleted by admin');
+                //     firebase.auth().currentUser.delete();
+                // }
+                // else {
+                //     firebase.database(`/users/${data.user.uid}/`).once('value' , snap =>{
+                //          console.log(snap.val());
+                //     })
+
+                //     let success = 'successfully logged in';
+                //      this.props.signIn(success);
+                //      Actions.push('/doctor');
+
+                // }
+            })
+
+            .catch((err) => {
+                this.props.signIn(err);
+                alert(err);
+            })
     }
     render() {
         return (
             <Container >
                 {/* {
                     this.state.open ? <Logo /> : */}
-                        <Container style={styles.container}>
+                <Container style={styles.container}>
 
-                            <Item style={styles.itemCss}>
-                                <Icon active style={styles.iconColor} name="person" />
-                                <Input style={styles.inputColor} placeholderTextColor='white' placeholder='Username' 
-                                    onChangeText={(evt)=> this.setState({username:evt})}
-                                />
-                            </Item>
+                    <Item style={styles.itemCss}>
+                        <Icon active style={styles.iconColor} name="person" />
+                        <Input style={styles.inputColor} placeholderTextColor='white' placeholder='Username'
+                            onChangeText={(evt) => this.setState({ username: evt })}
+                        />
+                    </Item>
 
-                            <Item style={styles.itemCss}>
-                                <Icon active style={styles.iconColor} name="eye" />
-                                <Input style={styles.inputColor} placeholderTextColor='white' placeholder='Password'
-                                    onChangeText={(evt) => this.setState({password:evt})}
-                                />
-                            </Item>
+                    <Item style={styles.itemCss}>
+                        <Icon active style={styles.iconColor} name="eye" />
+                        <Input style={styles.inputColor} placeholderTextColor='white' placeholder='Password'
+                            onChangeText={(evt) => this.setState({ password: evt })}
+                        />
+                    </Item>
 
-                            {
-                                this.state.loader ?
-                                <Item style={styles.loginButton}>
-                                <Button full light  style={styles.button} onPress={() => this.myLogInFuction()} >
+                    {
+                        this.state.loader ?
+                            <Item style={styles.loginButton}>
+                                <Button full light style={styles.button} onPress={() => this.myLogInFuction()} >
                                     <Text style={styles.buttonText}>Log In</Text>
                                 </Button>
-                                </Item>  :
-    
-                                <Content>
-                                    <Spinner color="white"/>
-                                </Content>
-                            }
-                            <Container style={styles.containerCss}>
-                                <Text style={styles.textCss}>Don't have an account? </Text>
-                                <Text style={styles.linkCss} onPress={() => Actions.push('/signup')}>
-                                     Sign Up</Text>
-                        
-                            </Container>
-                           
-                        </Container>
-                {/* } */}
+                            </Item> :
+
+                            <Content>
+                                <Spinner color="white" />
+                            </Content>
+                    }
+                    <Container style={styles.containerCss}>
+                        <Text style={styles.textCss}>Don't have an account? </Text>
+                        <Text style={styles.linkCss} onPress={() => Actions.push('/signup')}>
+                            Sign Up</Text>
+
+                    </Container>
+
+                </Container>
+
             </Container>
         );
     }
 }
 
-export function mapStateToProps(state){
-    return{
+export function mapStateToProps(state) {
+    return {
 
     }
 }
 
-export function mapDispatchToProps(dispatch){
-    return{
-        signIn : (result) =>{
+export function mapDispatchToProps(dispatch) {
+    return {
+        signIn: (result) => {
             dispatch(
                 signIn(result)
             )
         }
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(Login)
+export default connect(mapStateToProps, mapDispatchToProps)(Login)
 
 const styles = StyleSheet.create({
     container: {
@@ -147,16 +165,16 @@ const styles = StyleSheet.create({
         marginRight: 'auto',
         marginTop: 20
     },
-    loginButton:{
-        marginLeft:'auto',
-        marginRight:'auto',
+    loginButton: {
+        marginLeft: 'auto',
+        marginRight: 'auto',
         paddingTop: 20,
 
     },
-    button : {
-        
-        paddingLeft:'32%',
-        paddingRight:'32%',
-        
+    button: {
+
+        paddingLeft: '32%',
+        paddingRight: '32%',
+
     },
 })

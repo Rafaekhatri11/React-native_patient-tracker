@@ -35,7 +35,7 @@ class Signup extends Component {
                
                 let success = "successfully created";
                 this.props.signUp(success);
-                Actions.push('/doctor')
+                Actions.push('/doctorpage')
             })
             .catch((err) => {
                 this.props.signUp(err);
