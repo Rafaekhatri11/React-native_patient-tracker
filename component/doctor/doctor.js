@@ -4,8 +4,10 @@ import firebase from 'firebase';
 import { Actions } from 'react-native-router-flux';
 import {DrawerNavigator , DrawerItems} from 'react-navigation';
 import Homescreen from './Homescreen';
-import SettingScreen from './settingscreen';
-import { Header, Body ,Icon,Container,Content } from 'native-base';
+import SettingScreen from './searchbyname';
+import { Header, Body ,Container,Content } from 'native-base';
+import SearchByDate from './searchbydate';
+
 
 export default class Doctorpage extends Component {
 
@@ -42,8 +44,11 @@ const MyApp = DrawerNavigator({
     Home:{
         screen: Homescreen
     },
-    Setting :{ 
+    Search_Patient :{ 
         screen: SettingScreen
+    },
+    Search_By_Date : {
+        screen : SearchByDate
     }
     
 },

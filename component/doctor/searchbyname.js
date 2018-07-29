@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 
 
-import { View, Left, StyleSheet, Right , Body,
-     Icon, Button, Container, Header, Content, Text } from 'native-base';
+import {
+    View, Left, StyleSheet, Right, Body,Item,Input,
+    Icon, Button, Container, Header, Content, Text
+} from 'native-base';
 
 
 
@@ -19,6 +21,16 @@ export default class SettingScreen extends Component {
                     </Left>
                     <Right />
                     <Body />
+                </Header>
+                <Header searchBar rounded>
+                    <Item>
+                        <Icon name="ios-search" />
+                        <Input placeholder="Search" />
+                        <Icon name="ios-people" />
+                    </Item>
+                    <Button transparent>
+                        <Text>Search</Text>
+                    </Button>
                 </Header>
                 <Content>
                     <Text>Setting Screen</Text>
