@@ -21,11 +21,13 @@ class Login extends Component {
             password: ""
         }
     }
-    // componentDidMount() {
-    //     setTimeout(() => {
-    //         this.setState({ open: false })
-    //     }, 1000);
+
+    // componentWillMount(){
+    //     firebase.auth().onAuthStateChanged((user) =>{
+    //         user.uid != null ? Actions.push('/doctorpage') : ""
+    //     })
     // }
+  
 
     myLogInFuction() {
         this.setState({ loader: false })

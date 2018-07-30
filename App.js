@@ -19,15 +19,7 @@ import * as firebase from 'firebase';
 import Doctorpage from './component/doctor/doctor';
 
   // Initialize Firebase
-  const config = {
-    apiKey: "AIzaSyC2Re6I2QECdkZ2DpOK7QqFa5hA0n1HeOM",
-    authDomain: "myquiz-d54f3.firebaseapp.com",
-    databaseURL: "https://myquiz-d54f3.firebaseio.com",
-    projectId: "myquiz-d54f3",
-    storageBucket: "myquiz-d54f3.appspot.com",
-    messagingSenderId: "62983173526"
-  };
-  firebase.initializeApp(config);
+ 
 
 export default class App extends Component {
 
@@ -39,8 +31,8 @@ export default class App extends Component {
            <Router>
           <Scene key="root">
           <Scene key="/signup" component={Signup} hideNavBar title="Sign Up"/>
-          <Scene key="/login" component={Login} hideNavBar title="Log In" />
-          <Scene key="/doctorpage" component={Doctorpage} initial  />
+          <Scene key="/login" component={Login} hideNavBar title="Log In" initial />
+          <Scene key="/doctorpage" component={Doctorpage}   />
 
           </Scene>
           </Router>
@@ -50,3 +42,13 @@ export default class App extends Component {
   }
 }
 
+
+const config = {
+  apiKey: "AIzaSyBA4sH1p2zXm9jISA4vyL88qryfCNUPtTU",
+  authDomain: "react-native-patient-tracker.firebaseapp.com",
+  databaseURL: "https://react-native-patient-tracker.firebaseio.com",
+  projectId: "react-native-patient-tracker",
+  storageBucket: "react-native-patient-tracker.appspot.com",
+  messagingSenderId: "145377865993"
+};
+firebase.initializeApp(config);
