@@ -22,11 +22,12 @@ class Login extends Component {
         }
     }
 
-    // componentWillMount(){
-    //     firebase.auth().onAuthStateChanged((user) =>{
-    //         user.uid != null ? Actions.push('/doctorpage') : ""
-    //     })
-    // }
+    componentDidMount(){
+        firebase.auth().onAuthStateChanged((user) => {
+            !user.uid ? Actions.push('/login') : Actions.push('/doctorpage')
+        })
+        
+    }
   
 
     myLogInFuction() {

@@ -42,7 +42,7 @@ export default class Homescreen extends Component {
         else {
             console.log(this.state);
             firebase.auth().onAuthStateChanged((user) =>{
-                firebase.database().ref(`/patients/${user.uid}/`).set({
+                firebase.database().ref(`/patients/${user.uid}/`).push().set({
                     Name : this.state.patientName,
                     Address: this.state.patientAddress,
                     Info : this.state.patientInformation,
