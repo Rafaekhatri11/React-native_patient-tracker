@@ -1,135 +1,158 @@
 import React, { Component } from 'react';
 import {
     StyleSheet,
-
+    AsyncStorage
 } from 'react-native';
 
 import { Container, Text, Item, Input, Icon, Button, Content, Spinner } from 'native-base';
-import Logo from '../projectLogo/logo';
-import { signIn } from '../store/action/action';
+import { signIn, doctorpageforuid, loadersignin } from '../store/action/action';
 import { Actions } from 'react-native-router-flux';
 import { connect } from 'react-redux';
 import firebase from 'firebase';
-
 class Login extends Component {
     constructor() {
         super();
         this.state = {
             open: true,
-            loader: true,
+            loader: false,
             username: "",
             password: ""
         }
     }
 
-    componentDidMount(){
-        firebase.auth().onAuthStateChanged((user) => {
-            !user.uid ? Actions.push('/login') : Actions.push('/doctorpage')
-        })
+    componentWillMount(){
         
+        firebase.auth().onAuthStateChanged((data) => {
+            AsyncStorage.getItem('useruid').then((uid) =>{
+                console.log('willmount' ,uid);
+                if(data.uid === uid ){
+                    Actions.push('doctorpage')
+                }
+                else{
+                    Actions.push('login')
+                }
+            })
+           
+        })
     }
-  
+
+    componentWillReceiveProps(nextProps) {
+        console.log('will recieve props', nextProps);
+        this.setState({ loader: nextProps.getflag.loaderforsignin });
+    }
+
 
     myLogInFuction() {
-        this.setState({ loader: false })
-        let email = this.state.username;
-        let pass = this.state.password
-        firebase.auth().signInWithEmailAndPassword(email, pass)
-            .then((data) => {
-
-                firebase.database().ref(`/users/${data.user.uid}/`).once('value').then((user) => {
-                    console.log(user.key)
-                    if (user.key === null) {
-                        alert('User has been deleted by admin');
-                        firebase.auth().currentUser.delete();
-                    }
-
-                    else {
-                        let success = 'successfully logged in';
-                        this.props.signIn(success);
-                        Actions.push('/doctorpage');
-                    }
-                })
-
-                // if (data.val() === null) {
-                //     alert('User has been deleted by admin');
-                //     firebase.auth().currentUser.delete();
-                // }
-                // else {
-                //     firebase.database(`/users/${data.user.uid}/`).once('value' , snap =>{
-                //          console.log(snap.val());
-                //     })
-
-                //     let success = 'successfully logged in';
-                //      this.props.signIn(success);
-                //      Actions.push('/doctor');
-
-                // }
-            })
-
-            .catch((err) => {
-                this.props.signIn(err);
-                alert(err);
-            })
+        let trueflag = true;
+      
+       
+    
+        if( this.state.username === "" || this.state.password === "") {
+            alert('Please fill all the fields');
+        }
+        else { 
+            this.props.loadersignin(trueflag);
+            let detail = {
+                email : this.state.username,
+                pass : this.state.password,
+                falseflag : false
+            }
+           this.props.signIn(detail);
+           
+        }
     }
-    render() {
-        return (
-            <Container >
-                {/* {
+
+        // firebase.auth().signInWithEmailAndPassword(email, pass)
+        //     .then((data) => {
+
+        //         firebase.database().ref(`/users/${data.user.uid}/`).once('value').then((user) => {
+        //             console.log(user.key)
+        //             if (user.key === null) {
+        //                 alert('User has been deleted by admin');
+        //                 firebase.auth().currentUser.delete();
+        //             }
+
+        //             else {  
+        //                 let success = 'successfully logged in';
+        //                 this.props.signIn(success); 
+        //                 this.props.doctorpageforuid(data.user.uid);
+        //                 Actions.push("doctorpage");
+        //             }
+        //         })
+
+            // })
+
+           
+
+        render() {
+            return (
+                <Container >
+                    {/* {
                     this.state.open ? <Logo /> : */}
-                <Container style={styles.container}>
+                    <Container style={styles.container}>
 
-                    <Item style={styles.itemCss}>
-                        <Icon active style={styles.iconColor} name="person" />
-                        <Input style={styles.inputColor} placeholderTextColor='white' placeholder='Username'
-                            onChangeText={(evt) => this.setState({ username: evt })}
-                        />
-                    </Item>
+                        <Item style={styles.itemCss}>
+                            <Icon active style={styles.iconColor} name="person" />
+                            <Input style={styles.inputColor} placeholderTextColor='white' placeholder='Username'
+                                onChangeText={(evt) => this.setState({ username: evt })}
+                            />
+                        </Item>
 
-                    <Item style={styles.itemCss}>
-                        <Icon active style={styles.iconColor} name="eye" />
-                        <Input style={styles.inputColor} placeholderTextColor='white' placeholder='Password'
-                            onChangeText={(evt) => this.setState({ password: evt })}
-                        />
-                    </Item>
+                        <Item style={styles.itemCss}>
+                            <Icon active style={styles.iconColor} name="eye" />
+                            <Input style={styles.inputColor} placeholderTextColor='white' placeholder='Password'
+                                onChangeText={(evt) => this.setState({ password: evt })} secureTextEntry={true}
+                            />
+                        </Item>
 
-                    {
-                        this.state.loader ?
-                            <Item style={styles.loginButton}>
-                                <Button full light style={styles.button} onPress={() => this.myLogInFuction()} >
-                                    <Text style={styles.buttonText}>Log In</Text>
-                                </Button>
-                            </Item> :
+                        {
+                            this.state.loader ?
+                                <Content>
+                                    <Spinner color="white" />
+                                </Content>
+                                :
+                                <Item style={styles.loginButton}>
+                                    <Button full light style={styles.button} onPress={() => this.myLogInFuction()} >
+                                        <Text style={styles.buttonText}>Log In</Text>
+                                    </Button>
+                                </Item>
 
-                            <Content>
-                                <Spinner color="white" />
-                            </Content>
-                    }
-                    <Container style={styles.containerCss}>
-                        <Text style={styles.textCss}>Don't have an account? </Text>
-                        <Text style={styles.linkCss} onPress={() => Actions.push('/signup')}>
-                            Sign Up</Text>
+                        }
+                        <Container style={styles.containerCss}>
+                            <Text style={styles.textCss}>Don't have an account? </Text>
+                            <Text style={styles.linkCss} onPress={() => Actions.push('signup')}>
+                                Sign Up</Text>
+
+                        </Container>
 
                     </Container>
 
                 </Container>
-
-            </Container>
-        );
+            );
+        }
     }
-}
 
 export function mapStateToProps(state) {
     return {
-
+        getflag: state
     }
 }
 
 export function mapDispatchToProps(dispatch) {
     return {
-        signIn: (result) => {
+        signIn : (detail) => {
             dispatch(
-                signIn(result)
+                signIn(detail)
+            )
+        },
+        doctorpageforuid: (uid) => {
+            dispatch(
+                doctorpageforuid(uid)
+            )
+        },
+        loadersignin: (flag) => {
+            dispatch(
+                loadersignin(flag)
             )
         }
     }

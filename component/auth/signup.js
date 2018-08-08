@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import {
     StyleSheet,
-
 } from 'react-native';
-import { signUp } from '../store/action/action';
+import { signUp, doctorpageforuid, loadersignup } from '../store/action/action';
 import { Container, Text, Item, Input, Icon, Content, Button, Spinner } from 'native-base';
 import { Actions } from 'react-native-router-flux';
 import { connect } from 'react-redux';
@@ -15,32 +14,32 @@ class Signup extends Component {
             name: '',
             username: '',
             password: '',
-            loader: true
+            loader: false
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        console.log('recieve props ', nextProps);
+        this.setState({ loader: nextProps.getflag.loaderforsignup })
+    }
+
     mySignUpFuction() {
-        this.setState({ loader: false });
-        let email = this.state.username;
-        let pass = this.state.password;
-        //   console.log(this.state.name);
-        firebase.auth().createUserWithEmailAndPassword(email, pass)
-            .then((data) => {
-                console.log(data.user.uid);
-                firebase.database().ref(`/users/${data.user.uid}/`).set({
-                    name: this.state.name,
-                    email: this.state.username,
-                    password: this.state.password
-                })
-               
-                let success = "successfully created";
-                this.props.signUp(success);
-                Actions.push('/doctorpage')
-            })
-            .catch((err) => {
-                this.props.signUp(err);
-                alert(err);
-            })
+        if (this.state.username === "" || this.state.password === "" || this.state.name === "") {
+            alert('please enter all fields');
+        }
+        else {
+
+        }
+        let trueflag = true;
+        let detail = {
+            name: this.state.name,
+            email: this.state.username,
+            pass: this.state.password,
+            falseflag: false
+        }
+        this.props.loadersignup(trueflag);
+        this.props.signUp(detail);
+
     }
     render() {
         return (
@@ -63,24 +62,25 @@ class Signup extends Component {
                 <Item style={styles.itemCss}>
                     <Icon active style={styles.iconColor} name="eye" />
                     <Input style={styles.inputColor} placeholderTextColor='white' placeholder='Password'
-                        onChangeText={(evt) => this.setState({ password: evt })}
+                        onChangeText={(evt) => this.setState({ password: evt })} secureTextEntry={true}
                     />
                 </Item>
                 {
                     this.state.loader ?
+                        <Content>
+                            <Spinner color="white" />
+                        </Content> :
                         <Item style={styles.signupButton}>
                             <Button full light style={styles.button} onPress={() => this.mySignUpFuction()} >
                                 <Text style={styles.buttonText}>Sign Up</Text>
                             </Button>
-                        </Item> :
+                        </Item>
 
-                        <Content>
-                            <Spinner color="white" />
-                        </Content>
+
                 }
                 <Container style={styles.containerCss}>
                     <Text style={styles.textCss}>Already have an account?</Text>
-                    <Text style={styles.linkCss} onPress={() => Actions.push('/login')}>
+                    <Text style={styles.linkCss} onPress={() => Actions.push('login')}>
                         Log In</Text>
 
                 </Container>
@@ -92,15 +92,25 @@ class Signup extends Component {
 
 export function mapStateToProps(state) {
     return {
-
+        getflag: state
     }
 }
 
 export function mapDispatchToProps(dispatch) {
     return {
-        signUp: (result) => {
+        signUp: (detail) => {
             dispatch(
-                signUp(result)
+                signUp(detail)
+            )
+        },
+        doctorpageforuid: (uid) => {
+            dispatch(
+                doctorpageforuid(uid)
+            )
+        },
+        loadersignup: (flag) => {
+            dispatch(
+                loadersignup(flag)
             )
         }
     }

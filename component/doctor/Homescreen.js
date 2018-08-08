@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import firebase from 'firebase';
-import { StyleSheet  } from 'react-native';
+import { StyleSheet ,AsyncStorage } from 'react-native';
 import {
     View, Icon, Left, Button, Body, Right, DatePicker,
     Container, Header, Content, Text, Item, Input, Radio, Form
 } from 'native-base';
+import {filterOutPatients ,getpatients } from '../store/action/action';
+import {connect} from 'react-redux';
 import RadioGroup from 'react-native-custom-radio-group';
 const radioGroupList= [
     {
@@ -17,7 +19,7 @@ const radioGroupList= [
     }
 ]
 
-export default class Homescreen extends Component {
+ class Homescreen extends Component {
     
     constructor() {
         super();    
@@ -28,38 +30,55 @@ export default class Homescreen extends Component {
             radiobuttonValue: 0,
             genderValue :'',
             Date: null,
-            value: ""
+            value: "",
+            useruid : ''
         }
        
     }
-   
-    
+
+    componentWillMount(){
+      
+        AsyncStorage.getItem('useruid').then((uid) =>{
+            this.setState({useruid: uid})
+        })
+    }
    
     addPatients() {
+        
+     
         if (this.state.patientName === "" || this.state.genderValue === ""||this.state.patientAddress === "" ,this.state.patientInformation === "" || this.state.Date === null) {
             alert('Please select all fields');
         }
         else {
             console.log(this.state);
-            firebase.auth().onAuthStateChanged((user) =>{
-                firebase.database().ref(`/patients/${user.uid}/`).push().set({
-                    Name : this.state.patientName,
-                    Address: this.state.patientAddress,
-                    Info : this.state.patientInformation,
-                    Gender: this.state.genderValue,
-                     Date: this.state.Date,
-                });
-            })
-            
-            alert('Successfully add');
-        }
-    }
 
+            
+            let detail = {
+                uid : this.state.useruid,
+                patientName: this.state.patientName,
+                patientAddress: this.state.patientAddress,
+                patientInformation : this.state.patientInformation,
+                Date : this.state.Date,
+                genderValue: this.state.genderValue
+            }
+            this.props.filterOutPatients(detail);
+            alert('Successfully add');
+       }
+    }
+ setDate(newDate) {
+     console.log(newDate);
+     let day = newDate.getDate();
+     let month= newDate.getMonth();
+     let year = newDate.getFullYear();
+     let fulldate = day+"-"+ (++month) +"-"+ year;
+     console.log(fulldate);
+    this.setState({ Date: fulldate });
+  }
   
     render() {
         return (
             <Container>
-                <Header>
+                <Header style={{backgroundColor:'green'}}>
                     <Left>
 
                         <Icon name="menu"
@@ -90,7 +109,7 @@ export default class Homescreen extends Component {
                         <Item>
                             <DatePicker
                                 defaultDate={new Date()}
-                                minimumDate={new Date(2018, 1, 1)}
+                                minimumDate={new Date()}
                                 maximumDate={new Date(2018, 12, 31)}
                                 locale={"en"}
                                 timeZoneOffsetInMinutes={undefined}
@@ -100,10 +119,10 @@ export default class Homescreen extends Component {
                                 placeHolderText="Select date"
                                 textStyle={{ color: "green" }}
                                 placeHolderTextStyle={{ color: "#d3d3d3" }}
-                                onDateChange={(date) => this.setState({ Date: date })}
+                                onDateChange={(ev) => this.setDate(ev)}
                                 value={this.state.Date}
                             />
-                        </Item>
+                        </Item>     
                         {/* <Item>
                             <Left style={styles.radioStyle}>
                                 <Text style={styles.radioStyle}>Male</Text>
@@ -115,7 +134,7 @@ export default class Homescreen extends Component {
                         <View>
                             <Left style={styles.radioStyle}>
                             
-                                <RadioGroup buttonContainerStyle={styles.radiobuttonstyle}
+                                <RadioGroup buttonContainerStyle={{width:80,height:10}}
                                  radioGroupList={radioGroupList} onChange={(value) => this.setState({genderValue: value })}
                                  />
                             </Left>
@@ -123,9 +142,9 @@ export default class Homescreen extends Component {
                        
 
                         <View style={styles.addbuttonstyle}>
-                            <Button iconLeft light primary onPress={() => this.addPatients()}>
-                                <Icon name='add' />
-                                <Text>Home</Text>
+                            <Button iconLeft light style={{backgroundColor:'green'}}  onPress={() => this.addPatients()}>
+                                <Icon name='add'    />
+                                <Text>Add</Text>
                             </Button>
                         </View>
                     </Form>
@@ -139,6 +158,7 @@ export default class Homescreen extends Component {
 const styles = StyleSheet.create({
     contentStyle: {
         marginLeft: '0%',
+        paddingTop: "20%",
     },
     radioStyle: {
         paddingLeft: 50,
@@ -149,8 +169,24 @@ const styles = StyleSheet.create({
         marginLeft: 'auto'
 
     },
-    radiobuttonstyle: {
-        width:80,
-        height:10
-    }
+
 })
+
+
+export function mapStateToProps(state) {
+    console.log(state)
+    return {    
+        getuid : state.doctorpageforid
+    }   
+}
+
+export function mapDispatchToProps(dispatch) {
+    return {
+        filterOutPatients : (uid) => {
+            dispatch(
+                filterOutPatients(uid)
+            )
+        }
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Homescreen)
